@@ -81,11 +81,16 @@ public static class KafkaDemo
         using var consumer = new ConsumerBuilder<string, byte[]>(config).Build();
         consumer.Subscribe(topic);
 
+        // EN: The first poll on a fresh broker can wait for the group join and the offsets topic,
+        // EN: so keep polling until a deadline instead of giving up on the first empty poll.
+        // PT: O primeiro poll em um broker novo pode esperar o group join e o tópico de offsets,
+        // PT: então continua tentando até um prazo, em vez de desistir no primeiro poll vazio.
+        var deadline = DateTime.UtcNow.AddSeconds(25);
         var seen = 0;
-        while (seen < expected && !ct.IsCancellationRequested)
+        while (seen < expected && DateTime.UtcNow < deadline && !ct.IsCancellationRequested)
         {
-            var result = consumer.Consume(TimeSpan.FromSeconds(10));
-            if (result is null) break;
+            var result = consumer.Consume(TimeSpan.FromSeconds(2));
+            if (result is null) continue;
 
             var order = Wire.Deserialize(result.Message.Value);
             Console.WriteLine($"[{group}] {order.CustomerId} R$ {order.Total} " +

@@ -1,15 +1,33 @@
 services:
   rabbitmq:
-    image: rabbitmq:4-management
+    image: rabbitmq:4.3-management
     ports:
-      - "5672:5672"     # AMQP
+      # EN: Bound to loopback only (IPv4 and IPv6, since "localhost" may resolve to ::1):
+      # EN: the broker (guest/guest) is not reachable from the network.
+      # PT: Só no loopback (IPv4 e IPv6, pois "localhost" pode resolver para ::1):
+      # PT: o broker (guest/guest) não fica acessível pela rede.
+      - "127.0.0.1:5672:5672"     # AMQP
+      - "[::1]:5672:5672"
       # EN: management UI (guest/guest).
       # PT: painel de administração (guest/guest).
-      - "15672:15672"
+      - "127.0.0.1:15672:15672"
+      - "[::1]:15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 10s
+      retries: 20
 
   kafka:
     # EN: KRaft mode: no ZooKeeper.
     # PT: modo KRaft: sem ZooKeeper.
     image: apache/kafka:4.0.0
     ports:
-      - "9092:9092"
+      - "127.0.0.1:9092:9092"
+      - "[::1]:9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 5s
+      timeout: 15s
+      retries: 30
+      start_period: 10s
