@@ -1,0 +1,53 @@
+name: Bug report / Relato de bug
+description: Something does not work as the README says. / Algo não funciona como o README diz.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! For security problems **do not** use this form: use the private channel in SECURITY.md.
+        Obrigado pelo relato! Para problemas de segurança **não** use este formulário: use o canal privado do SECURITY.md.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened? / O que aconteceu?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect? / O que você esperava?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / Passos para reproduzir
+      description: The exact commands you ran. / Os comandos exatos que você rodou.
+      render: shell
+    validations:
+      required: true
+  - type: input
+    id: dotnet
+    attributes:
+      label: .NET SDK version / Versão do SDK do .NET
+      description: "Output of / Saída de: dotnet --version"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system / Sistema operacional
+    validations:
+      required: true
+  - type: input
+    id: docker
+    attributes:
+      label: Docker version / Versão do Docker
+      description: "Output of / Saída de: docker --version"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Output or logs / Saída ou logs
+      render: text

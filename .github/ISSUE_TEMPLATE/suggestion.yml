@@ -1,0 +1,30 @@
+name: Suggestion / Sugestão
+description: An improvement to the example or the docs. / Uma melhoria no exemplo ou na documentação.
+title: "[Suggestion] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This repository is small, didactic code that accompanies an article, so large new features may be declined to keep it readable.
+        Este repositório é código didático e pequeno que acompanha um artigo, então funcionalidades grandes podem ser recusadas para mantê-lo legível.
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you change or add? / O que você mudaria ou adicionaria?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why does it help? / Por que isso ajuda?
+    validations:
+      required: true
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you send a pull request? / Você enviaria um pull request?
+      options:
+        - "Yes / Sim"
+        - "Maybe / Talvez"
+        - "No / Não"
