@@ -37,6 +37,7 @@ The CI (`.github/workflows/ci.yml`) runs the same example and **checks its outpu
 - **Do not rename identifiers.** Class, method, route and tool names (many in Portuguese) are referenced by the article.
 - **Commit messages** follow the existing style: `feat:`, `fix:`, `docs:`, `ci:`.
 - By contributing you agree that your work is licensed under the [MIT License](LICENSE).
+- Be respectful: please follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 Security problems go through the private channel in [SECURITY.md](SECURITY.md), not through issues.
 
@@ -75,5 +76,6 @@ O CI (`.github/workflows/ci.yml`) roda o mesmo exemplo e **confere a saída**. S
 - **Não renomeie identificadores.** Nomes de classes, métodos, rotas e tools (muitos em português) são citados no artigo.
 - **Mensagens de commit** seguem o estilo existente: `feat:`, `fix:`, `docs:`, `ci:`.
 - Ao contribuir, você concorda que o seu trabalho é licenciado sob a [Licença MIT](LICENSE).
+- Seja respeitoso: siga o [Código de Conduta](CODE_OF_CONDUCT.md).
 
 Problemas de segurança vão pelo canal privado em [SECURITY.md](SECURITY.md), não por issues.
