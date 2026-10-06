@@ -2,6 +2,16 @@ English | [Português](README.pt-BR.md)
 
 # Kafka vs RabbitMQ in .NET
 
+> **Quick start**
+
+```bash
+docker compose up -d
+dotnet run -- rabbit
+dotnet run -- kafka
+```
+
+Needs the .NET 10 SDK and Docker. Details in [Running](#running).
+
 Two small, runnable demos that put **RabbitMQ** (`RabbitMQ.Client` 7.2.2) and **Apache Kafka** (`Confluent.Kafka` 2.15.1) side by side on .NET 10. Both move the same `OrderPlaced` event (order id, customer id, total), so the differences in model and guarantees are easy to compare.
 
 ## Prerequisites
