@@ -1,5 +1,7 @@
 English | [Português](README.pt-BR.md)
 
+[![CI](https://github.com/ceseidl/kafka-vs-rabbitmq-dotnet/actions/workflows/ci.yml/badge.svg)](https://github.com/ceseidl/kafka-vs-rabbitmq-dotnet/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 # Kafka vs RabbitMQ in .NET
 
 > **Quick start**
@@ -29,6 +31,8 @@ docker compose up -d
 
 - RabbitMQ: AMQP on `localhost:5672`, management UI on <http://localhost:15672> (`guest` / `guest`)
 - Kafka: `localhost:9092`
+
+The ports are bound to the loopback (`127.0.0.1` and `[::1]`) only, so the brokers (RabbitMQ uses `guest` / `guest`) are not reachable from other machines. `docker compose up -d --wait` also waits for the health checks.
 
 Then run one of the demos (each one has a 60-second timeout):
 
@@ -116,3 +120,7 @@ Both demos publish six sample orders for two customers (`cli-1`, `cli-2`). One o
 ├── RabbitMqDemo.cs         # RabbitMQ demo
 └── KafkaDemo.cs            # Kafka demo
 ```
+
+## License
+
+[MIT](LICENSE). Author: Carlos Eduardo Seidl.

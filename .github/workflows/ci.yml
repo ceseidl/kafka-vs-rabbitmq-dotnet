@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        run: dotnet build --nologo
+
+      - name: Start brokers
+        run: docker compose up -d --wait
+
+      - name: Smoke test (RabbitMQ)
+        run: |
+          out=$(dotnet run --no-build -- rabbit)
+          echo "$out"
+          echo "$out" | grep -F 'orders.audit (copy without consumer / cópia sem consumidor): 6 msgs'
+          echo "$out" | grep -F 'orders.dead (dead-letter): 1 msgs'
+
+      - name: Smoke test (Kafka)
+        run: |
+          out=$(dotnet run --no-build -- kafka)
+          echo "$out"
+          echo "$out" | grep -F '[billing] read 6 of 6 events'
+          echo "$out" | grep -F '[analytics] read 6 of 6 events'
+
+      - name: Stop brokers
+        if: always()
+        run: docker compose down -v
