@@ -29,6 +29,49 @@ dotnet run -- kafka
 
 Running without an argument prints the usage line.
 
+## Example output
+
+RabbitMQ (`dotnet run -- rabbit`):
+
+```
+[worker-1] processed / processou cli-1 R$ 100
+[worker-2] processed / processou cli-2 R$ 250
+[worker-1] failed / falhou (Invalid total / Total inválido) -> dead-letter
+[worker-2] processed / processou cli-2 R$ 80
+[worker-1] processed / processou cli-1 R$ 40
+[worker-2] processed / processou cli-2 R$ 15
+orders.process (after consumption / após consumo): 0 msgs
+orders.audit (copy without consumer / cópia sem consumidor): 6 msgs
+orders.dead (dead-letter): 1 msgs
+```
+
+Kafka (`dotnet run -- kafka`):
+
+```
+produced / produziu cli-1 -> partition / partição 2, offset 0
+produced / produziu cli-2 -> partition / partição 1, offset 0
+produced / produziu cli-1 -> partition / partição 2, offset 1
+produced / produziu cli-2 -> partition / partição 1, offset 1
+produced / produziu cli-1 -> partition / partição 2, offset 2
+produced / produziu cli-2 -> partition / partição 1, offset 2
+[billing] cli-1 R$ 100 (partition / partição 2, offset 0)
+[billing] cli-1 R$ 0 (partition / partição 2, offset 1)
+[billing] cli-1 R$ 40 (partition / partição 2, offset 2)
+[billing] cli-2 R$ 250 (partition / partição 1, offset 0)
+[billing] cli-2 R$ 80 (partition / partição 1, offset 1)
+[billing] cli-2 R$ 15 (partition / partição 1, offset 2)
+[billing] read 6 of 6 events / leu 6 de 6 eventos
+[analytics] cli-1 R$ 100 (partition / partição 2, offset 0)
+[analytics] cli-1 R$ 0 (partition / partição 2, offset 1)
+[analytics] cli-1 R$ 40 (partition / partição 2, offset 2)
+[analytics] cli-2 R$ 250 (partition / partição 1, offset 0)
+[analytics] cli-2 R$ 80 (partition / partição 1, offset 1)
+[analytics] cli-2 R$ 15 (partition / partição 1, offset 2)
+[analytics] read 6 of 6 events / leu 6 de 6 eventos
+```
+
+Which worker handles which order, and which partition each customer lands on, may differ between runs. The Kafka producer may also log an `rdkafka` idempotence warning while the broker is still starting.
+
 ## What each demo shows
 
 Both demos publish six sample orders for two customers (`cli-1`, `cli-2`). One of them is invalid (total of `0`).

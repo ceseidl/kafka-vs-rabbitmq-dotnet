@@ -29,6 +29,49 @@ dotnet run -- kafka
 
 Rodar sem argumento imprime a linha de uso.
 
+## Exemplo de saída
+
+RabbitMQ (`dotnet run -- rabbit`):
+
+```
+[worker-1] processed / processou cli-1 R$ 100
+[worker-2] processed / processou cli-2 R$ 250
+[worker-1] failed / falhou (Invalid total / Total inválido) -> dead-letter
+[worker-2] processed / processou cli-2 R$ 80
+[worker-1] processed / processou cli-1 R$ 40
+[worker-2] processed / processou cli-2 R$ 15
+orders.process (after consumption / após consumo): 0 msgs
+orders.audit (copy without consumer / cópia sem consumidor): 6 msgs
+orders.dead (dead-letter): 1 msgs
+```
+
+Kafka (`dotnet run -- kafka`):
+
+```
+produced / produziu cli-1 -> partition / partição 2, offset 0
+produced / produziu cli-2 -> partition / partição 1, offset 0
+produced / produziu cli-1 -> partition / partição 2, offset 1
+produced / produziu cli-2 -> partition / partição 1, offset 1
+produced / produziu cli-1 -> partition / partição 2, offset 2
+produced / produziu cli-2 -> partition / partição 1, offset 2
+[billing] cli-1 R$ 100 (partition / partição 2, offset 0)
+[billing] cli-1 R$ 0 (partition / partição 2, offset 1)
+[billing] cli-1 R$ 40 (partition / partição 2, offset 2)
+[billing] cli-2 R$ 250 (partition / partição 1, offset 0)
+[billing] cli-2 R$ 80 (partition / partição 1, offset 1)
+[billing] cli-2 R$ 15 (partition / partição 1, offset 2)
+[billing] read 6 of 6 events / leu 6 de 6 eventos
+[analytics] cli-1 R$ 100 (partition / partição 2, offset 0)
+[analytics] cli-1 R$ 0 (partition / partição 2, offset 1)
+[analytics] cli-1 R$ 40 (partition / partição 2, offset 2)
+[analytics] cli-2 R$ 250 (partition / partição 1, offset 0)
+[analytics] cli-2 R$ 80 (partition / partição 1, offset 1)
+[analytics] cli-2 R$ 15 (partition / partição 1, offset 2)
+[analytics] read 6 of 6 events / leu 6 de 6 eventos
+```
+
+Qual worker trata cada pedido, e em qual partição cada cliente cai, pode variar entre execuções. O produtor Kafka também pode registrar um aviso de idempotência do `rdkafka` enquanto o broker ainda está subindo.
+
 ## O que cada demo mostra
 
 As duas demos publicam seis pedidos de exemplo para dois clientes (`cli-1`, `cli-2`). Um deles é inválido (total `0`).

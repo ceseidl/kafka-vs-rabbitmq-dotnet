@@ -97,7 +97,7 @@ public static class KafkaDemo
             seen++;
         }
 
-        Console.WriteLine($"[{group}] read / leu {seen} of / de {expected} events / eventos");
+        Console.WriteLine($"[{group}] read {seen} of {expected} events / leu {seen} de {expected} eventos");
         consumer.Close();
     }
 }
