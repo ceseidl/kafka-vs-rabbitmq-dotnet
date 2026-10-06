@@ -9,14 +9,16 @@ public static class KafkaDemo
 
     public static async Task RunAsync(CancellationToken ct)
     {
-        // Tópico novo a cada execução: a demo não depende de offsets antigos
+        // EN: Fresh topic on every run: the demo does not depend on old offsets.
+        // PT: Tópico novo a cada execução: a demo não depende de offsets antigos.
         var topic = $"orders-{Guid.NewGuid():N}"[..14];
         await CreateTopicAsync(topic);
 
         var orders = Wire.Sample();
         await ProduceAsync(topic, orders, ct);
 
-        // Dois grupos leem os MESMOS eventos, cada um no seu ritmo
+        // EN: Two groups read the SAME events, each at its own pace.
+        // PT: Dois grupos leem os MESMOS eventos, cada um no seu ritmo.
         Consume("billing", topic, orders.Count, ct);
         Consume("analytics", topic, orders.Count, ct);
     }
@@ -38,14 +40,19 @@ public static class KafkaDemo
         var config = new ProducerConfig
         {
             BootstrapServers = Bootstrap,
-            Acks = Acks.All,           // espera as réplicas em sincronia
-            EnableIdempotence = true,  // retry sem duplicar
+            // EN: Waits for the in-sync replicas.
+            // PT: Espera as réplicas em sincronia.
+            Acks = Acks.All,
+            // EN: Retries without duplicating.
+            // PT: Retry sem duplicar.
+            EnableIdempotence = true,
         };
         using var producer = new ProducerBuilder<string, byte[]>(config).Build();
 
         foreach (var order in orders)
         {
-            // A chave define a partição: mesmo cliente -> mesma partição -> ordem preservada
+            // EN: The key defines the partition: same customer -> same partition -> order preserved.
+            // PT: A chave define a partição: mesmo cliente -> mesma partição -> ordem preservada.
             var message = new Message<string, byte[]>
             {
                 Key = order.CustomerId,
@@ -53,7 +60,7 @@ public static class KafkaDemo
             };
             var result = await producer.ProduceAsync(topic, message, ct);
 
-            Console.WriteLine($"produziu {order.CustomerId} -> partição {result.Partition.Value}, " +
+            Console.WriteLine($"produced / produziu {order.CustomerId} -> partition / partição {result.Partition.Value}, " +
                               $"offset {result.Offset.Value}");
         }
     }
@@ -64,8 +71,12 @@ public static class KafkaDemo
         {
             BootstrapServers = Bootstrap,
             GroupId = group,
-            AutoOffsetReset = AutoOffsetReset.Earliest, // grupo novo lê desde o início
-            EnableAutoCommit = false,                   // commit só após processar
+            // EN: A new group reads from the beginning.
+            // PT: Grupo novo lê desde o início.
+            AutoOffsetReset = AutoOffsetReset.Earliest,
+            // EN: Commit only after processing.
+            // PT: Commit só após processar.
+            EnableAutoCommit = false,
         };
         using var consumer = new ConsumerBuilder<string, byte[]>(config).Build();
         consumer.Subscribe(topic);
@@ -78,13 +89,15 @@ public static class KafkaDemo
 
             var order = Wire.Deserialize(result.Message.Value);
             Console.WriteLine($"[{group}] {order.CustomerId} R$ {order.Total} " +
-                              $"(partição {result.Partition.Value}, offset {result.Offset.Value})");
+                              $"(partition / partição {result.Partition.Value}, offset {result.Offset.Value})");
 
-            consumer.Commit(result); // at-least-once: confirma depois do efeito
+            // EN: At-least-once: confirm after the side effect.
+            // PT: At-least-once: confirma depois do efeito.
+            consumer.Commit(result);
             seen++;
         }
 
-        Console.WriteLine($"[{group}] leu {seen} de {expected} eventos");
+        Console.WriteLine($"[{group}] read / leu {seen} of / de {expected} events / eventos");
         consumer.Close();
     }
 }

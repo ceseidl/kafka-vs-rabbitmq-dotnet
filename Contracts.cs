@@ -11,9 +11,10 @@ public static class Wire
 
     public static OrderPlaced Deserialize(ReadOnlySpan<byte> body) =>
         JsonSerializer.Deserialize<OrderPlaced>(body)
-        ?? throw new InvalidOperationException("Mensagem vazia");
+        ?? throw new InvalidOperationException("Empty message / Mensagem vazia");
 
-    // Pedidos de exemplo: dois clientes, e um pedido inválido (Total <= 0)
+    // EN: Sample orders: two customers, plus one invalid order (Total <= 0).
+    // PT: Pedidos de exemplo: dois clientes, e um pedido inválido (Total <= 0).
     public static IReadOnlyList<OrderPlaced> Sample() =>
     [
         new(Guid.NewGuid(), "cli-1", 100m),

@@ -18,7 +18,8 @@ public static class RabbitMqDemo
         await channel.ExchangeDeclareAsync(
             "orders.dlx", ExchangeType.Fanout, durable: true, cancellationToken: ct);
 
-        // Fila principal: quorum queue, com dead-letter para mensagens rejeitadas
+        // EN: Main queue: quorum queue, with dead-letter for rejected messages.
+        // PT: Fila principal: quorum queue, com dead-letter para mensagens rejeitadas.
         var args = new Dictionary<string, object?>
         {
             ["x-queue-type"] = "quorum",
@@ -31,13 +32,16 @@ public static class RabbitMqDemo
         await channel.QueueDeclareAsync(
             Dead, durable: true, exclusive: false, autoDelete: false, cancellationToken: ct);
 
-        // Duas filas ligadas à mesma chave: cada uma recebe uma cópia da mensagem
+        // EN: Two queues bound to the same key: each one receives a copy of the message.
+        // PT: Duas filas ligadas à mesma chave: cada uma recebe uma cópia da mensagem.
         await channel.QueueBindAsync(Process, Exchange, RoutingKey, cancellationToken: ct);
         await channel.QueueBindAsync(Audit, Exchange, RoutingKey, cancellationToken: ct);
         await channel.QueueBindAsync(Dead, "orders.dlx", "", cancellationToken: ct);
 
         foreach (var queue in new[] { Process, Audit, Dead })
-            await channel.QueuePurgeAsync(queue, ct); // demo repetível
+            // EN: Repeatable demo.
+            // PT: Demo repetível.
+            await channel.QueuePurgeAsync(queue, ct);
     }
 
     private static async Task<uint> Count(IChannel channel, string queue, CancellationToken ct) =>
@@ -45,10 +49,13 @@ public static class RabbitMqDemo
 
     public static async Task RunAsync(CancellationToken ct)
     {
-        var factory = new ConnectionFactory { HostName = "localhost" }; // guest/guest
+        // EN: Default credentials: guest/guest.
+        // PT: Credenciais padrão: guest/guest.
+        var factory = new ConnectionFactory { HostName = "localhost" };
         await using var connection = await factory.CreateConnectionAsync(ct);
 
-        // Confirmações do broker: o publish só retorna depois que o broker aceitou a mensagem
+        // EN: Publisher confirms: publish only returns after the broker has accepted the message.
+        // PT: Confirmações do broker: o publish só retorna depois que o broker aceitou a mensagem.
         var options = new CreateChannelOptions(
             publisherConfirmationsEnabled: true,
             publisherConfirmationTrackingEnabled: true);
@@ -60,7 +67,8 @@ public static class RabbitMqDemo
         var handled = 0;
         var done = new TaskCompletionSource();
 
-        // Prefetch 1: cada worker recebe uma mensagem por vez (distribuição justa)
+        // EN: Prefetch 1: each worker gets one message at a time (fair dispatch).
+        // PT: Prefetch 1: cada worker recebe uma mensagem por vez (distribuição justa).
         await channel.BasicQosAsync(0, prefetchCount: 1, global: false, ct);
 
         async Task StartWorker(string name)
@@ -72,14 +80,14 @@ public static class RabbitMqDemo
                 {
                     var order = Wire.Deserialize(ea.Body.Span);
                     if (order.Total <= 0)
-                        throw new InvalidOperationException("Total inválido");
+                        throw new InvalidOperationException("Invalid total / Total inválido");
 
-                    Console.WriteLine($"[{name}] processou {order.CustomerId} R$ {order.Total}");
+                    Console.WriteLine($"[{name}] processed / processou {order.CustomerId} R$ {order.Total}");
                     await channel.BasicAckAsync(ea.DeliveryTag, multiple: false);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"[{name}] falhou ({ex.Message}) -> dead-letter");
+                    Console.WriteLine($"[{name}] failed / falhou ({ex.Message}) -> dead-letter");
                     await channel.BasicNackAsync(ea.DeliveryTag, multiple: false, requeue: false);
                 }
                 finally
@@ -89,7 +97,8 @@ public static class RabbitMqDemo
                 }
             };
 
-            // autoAck: false -> a mensagem só sai da fila após o BasicAck
+            // EN: autoAck: false -> the message only leaves the queue after BasicAck.
+            // PT: autoAck: false -> a mensagem só sai da fila após o BasicAck.
             await channel.BasicConsumeAsync(Process, autoAck: false, consumer, ct);
         }
 
@@ -108,10 +117,12 @@ public static class RabbitMqDemo
         }
 
         await done.Task.WaitAsync(ct);
-        await Task.Delay(500, ct); // deixa o broker atualizar os contadores
+        // EN: Lets the broker update its counters.
+        // PT: Deixa o broker atualizar os contadores.
+        await Task.Delay(500, ct);
 
-        Console.WriteLine($"orders.process (após consumo): {await Count(channel, Process, ct)} msgs");
-        Console.WriteLine($"orders.audit (cópia sem consumidor): {await Count(channel, Audit, ct)} msgs");
+        Console.WriteLine($"orders.process (after consumption / após consumo): {await Count(channel, Process, ct)} msgs");
+        Console.WriteLine($"orders.audit (copy without consumer / cópia sem consumidor): {await Count(channel, Audit, ct)} msgs");
         Console.WriteLine($"orders.dead (dead-letter): {await Count(channel, Dead, ct)} msgs");
     }
 }

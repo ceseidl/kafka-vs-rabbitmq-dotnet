@@ -6,5 +6,5 @@ switch (args.FirstOrDefault())
 {
     case "rabbit": await RabbitMqDemo.RunAsync(cts.Token); break;
     case "kafka":  await KafkaDemo.RunAsync(cts.Token);    break;
-    default: Console.WriteLine("uso: dotnet run -- rabbit|kafka"); break;
+    default: Console.WriteLine("usage / uso: dotnet run -- rabbit|kafka"); break;
 }
