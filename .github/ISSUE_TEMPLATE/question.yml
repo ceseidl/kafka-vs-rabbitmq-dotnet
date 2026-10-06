@@ -1,0 +1,16 @@
+name: Question / Dúvida
+description: A question about the example or the article. / Uma dúvida sobre o exemplo ou o artigo.
+title: "[Question] "
+labels: ["question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question / Sua dúvida
+      description: Say which file or part of the article it is about. / Diga a qual arquivo ou trecho do artigo ela se refere.
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried? / O que você já tentou?

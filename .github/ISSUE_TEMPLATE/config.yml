@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability / Reportar uma vulnerabilidade de segurança
+    url: https://github.com/ceseidl/kafka-vs-rabbitmq-dotnet/security/advisories/new
+    about: Please report security problems privately, not as a public issue. / Reporte problemas de segurança em privado, não em uma issue pública.
