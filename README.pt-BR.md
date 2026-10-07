@@ -50,12 +50,12 @@ RabbitMQ (`dotnet run -- rabbit`):
 ```
 [worker-1] processed / processou cli-1 R$ 100
 [worker-2] processed / processou cli-2 R$ 250
-[worker-1] failed / falhou (Invalid total / Total inválido) -> dead-letter
+[worker-1] failed / falhou (Invalid total / Total inválido)
 [worker-2] processed / processou cli-2 R$ 80
 [worker-1] processed / processou cli-1 R$ 40
 [worker-2] processed / processou cli-2 R$ 15
 orders.process (after consumption / após consumo): 0 msgs
-orders.audit (copy without consumer / cópia sem consumidor): 6 msgs
+orders.audit (copy, no consumer / cópia sem consumidor): 6 msgs
 orders.dead (dead-letter): 1 msgs
 ```
 
@@ -90,7 +90,7 @@ Qual worker trata cada pedido, e em qual partição cada cliente cai, pode varia
 
 As duas demos publicam seis pedidos de exemplo para dois clientes (`cli-1`, `cli-2`). Um deles é inválido (total `0`).
 
-### RabbitMQ (`RabbitMqDemo.cs`)
+### RabbitMQ (`RabbitMqDemo.cs`, `RabbitMqDemo.Topology.cs`)
 
 - Uma **exchange direct** durável (`orders`) roteando a chave `order.placed`.
 - Uma **quorum queue** (`orders.process`) para o trabalho principal.
@@ -100,7 +100,7 @@ As duas demos publicam seis pedidos de exemplo para dois clientes (`cli-1`, `cli
 - **Prefetch 1**, com dois workers (`worker-1`, `worker-2`) dividindo a fila.
 - **Fan-out por duas filas**: `orders.process` e `orders.audit` são ligadas com a mesma chave, então cada uma recebe a sua cópia. Ninguém consome `orders.audit`, e no fim a demo imprime a contagem de mensagens de cada fila.
 
-### Kafka (`KafkaDemo.cs`)
+### Kafka (`KafkaDemo*.cs`)
 
 - Um tópico criado a cada execução (nome novo, então offsets antigos nunca importam) com **3 partições**.
 - O **id do cliente como chave** da mensagem: o mesmo cliente sempre vai para a mesma partição, então a ordem dele é preservada. O produtor imprime a partição e o offset de cada mensagem.
@@ -117,8 +117,11 @@ As duas demos publicam seis pedidos de exemplo para dois clientes (`cli-1`, `cli
 ├── docker-compose.yml      # RabbitMQ e Kafka (KRaft)
 ├── Program.cs              # ponto de entrada: dotnet run -- rabbit|kafka
 ├── Contracts.cs            # record OrderPlaced, serialização JSON, pedidos de exemplo
-├── RabbitMqDemo.cs         # demo do RabbitMQ
-└── KafkaDemo.cs            # demo do Kafka
+├── RabbitMqDemo.Topology.cs # RabbitMQ: exchanges, filas, bindings
+├── RabbitMqDemo.cs         # RabbitMQ: publicar e consumir
+├── KafkaDemo.cs            # Kafka: entrada e criação do tópico
+├── KafkaDemo.Producer.cs   # Kafka: produtor com chave
+└── KafkaDemo.Consumer.cs   # Kafka: grupos de consumo
 ```
 
 ## Licença

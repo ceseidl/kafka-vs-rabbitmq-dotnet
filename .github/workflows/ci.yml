@@ -30,7 +30,7 @@ jobs:
         run: |
           out=$(dotnet run --no-build -- rabbit)
           echo "$out"
-          echo "$out" | grep -F 'orders.audit (copy without consumer / cópia sem consumidor): 6 msgs'
+          echo "$out" | grep -F 'orders.audit (copy, no consumer / cópia sem consumidor): 6 msgs'
           echo "$out" | grep -F 'orders.dead (dead-letter): 1 msgs'
 
       - name: Smoke test (Kafka)

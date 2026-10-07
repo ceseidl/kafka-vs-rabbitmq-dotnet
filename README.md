@@ -50,12 +50,12 @@ RabbitMQ (`dotnet run -- rabbit`):
 ```
 [worker-1] processed / processou cli-1 R$ 100
 [worker-2] processed / processou cli-2 R$ 250
-[worker-1] failed / falhou (Invalid total / Total inválido) -> dead-letter
+[worker-1] failed / falhou (Invalid total / Total inválido)
 [worker-2] processed / processou cli-2 R$ 80
 [worker-1] processed / processou cli-1 R$ 40
 [worker-2] processed / processou cli-2 R$ 15
 orders.process (after consumption / após consumo): 0 msgs
-orders.audit (copy without consumer / cópia sem consumidor): 6 msgs
+orders.audit (copy, no consumer / cópia sem consumidor): 6 msgs
 orders.dead (dead-letter): 1 msgs
 ```
 
@@ -90,7 +90,7 @@ Which worker handles which order, and which partition each customer lands on, ma
 
 Both demos publish six sample orders for two customers (`cli-1`, `cli-2`). One of them is invalid (total of `0`).
 
-### RabbitMQ (`RabbitMqDemo.cs`)
+### RabbitMQ (`RabbitMqDemo.cs`, `RabbitMqDemo.Topology.cs`)
 
 - A durable **direct exchange** (`orders`) routing the key `order.placed`.
 - A **quorum queue** (`orders.process`) for the main work.
@@ -100,7 +100,7 @@ Both demos publish six sample orders for two customers (`cli-1`, `cli-2`). One o
 - **Prefetch 1**, with two workers (`worker-1`, `worker-2`) sharing the queue.
 - **Fan-out through two queues**: `orders.process` and `orders.audit` are bound with the same key, so each receives its own copy. Nobody consumes `orders.audit`, and at the end the demo prints the message count of each queue.
 
-### Kafka (`KafkaDemo.cs`)
+### Kafka (`KafkaDemo*.cs`)
 
 - A topic created on every run (fresh name, so old offsets never matter) with **3 partitions**.
 - The **customer id as message key**: the same customer always goes to the same partition, so its order is preserved. The producer prints the partition and offset of each message.
@@ -117,8 +117,11 @@ Both demos publish six sample orders for two customers (`cli-1`, `cli-2`). One o
 ├── docker-compose.yml      # RabbitMQ and Kafka (KRaft)
 ├── Program.cs              # entry point: dotnet run -- rabbit|kafka
 ├── Contracts.cs            # OrderPlaced record, JSON serialization, sample orders
-├── RabbitMqDemo.cs         # RabbitMQ demo
-└── KafkaDemo.cs            # Kafka demo
+├── RabbitMqDemo.Topology.cs # RabbitMQ: exchanges, queues, bindings
+├── RabbitMqDemo.cs         # RabbitMQ: publish and consume
+├── KafkaDemo.cs            # Kafka: entry point and topic creation
+├── KafkaDemo.Producer.cs   # Kafka: producer with key
+└── KafkaDemo.Consumer.cs   # Kafka: consumer groups
 ```
 
 ## License
