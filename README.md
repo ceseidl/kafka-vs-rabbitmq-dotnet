@@ -4,6 +4,8 @@ English | [Português](README.pt-BR.md)
 
 # Kafka vs RabbitMQ in .NET
 
+Full article: <https://ceseidl.com.br/en/artigos/kafka-vs-rabbitmq-dotnet/>
+
 > **Quick start**
 
 ```bash

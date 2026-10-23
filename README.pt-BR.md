@@ -4,6 +4,8 @@
 
 # Kafka vs RabbitMQ em .NET
 
+Artigo completo: <https://ceseidl.com.br/artigos/kafka-vs-rabbitmq-dotnet/>
+
 > **Início rápido**
 
 ```bash
